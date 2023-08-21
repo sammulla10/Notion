@@ -1,17 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:notion_app/stream/cart_stream.dart';
 import 'package:notion_app/utils/appcolors.dart';
 
-class MenuCard extends StatelessWidget {
+class MenuCard extends StatefulWidget {
+  final void Function(int menu_id, int partner_id, String size, int dprice,
+      int rdprice, int mdprice, int ldprice) addCartmain;
+
+  final int menu_id;
+  final int partner_id;
+  final int? quantity;
+  final String size;
+  final int amount;
   final String foodName;
   final bool isVeg;
   final String hotelName;
   final int rating;
   final int dprice;
   final int oprice;
+  final int rdprice;
+  final int mdprice;
+  final int ldprice;
   final String? image;
 
   const MenuCard({
-    super.key,
+    Key? key,
+    required this.menu_id,
+    required this.partner_id,
+    this.quantity,
+    required this.size,
+    required this.amount,
     required this.foodName,
     required this.isVeg,
     required this.hotelName,
@@ -19,8 +36,17 @@ class MenuCard extends StatelessWidget {
     required this.dprice,
     required this.oprice,
     required this.image,
-  });
+    required this.addCartmain,
+    required this.rdprice,
+    required this.mdprice,
+    required this.ldprice,
+  }) : super(key: key);
 
+  @override
+  State<MenuCard> createState() => _MenuCardState();
+}
+
+class _MenuCardState extends State<MenuCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -40,7 +66,7 @@ class MenuCard extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        foodName,
+                        widget.foodName,
                         style: const TextStyle(
                             fontSize: 22, fontWeight: FontWeight.w600),
                       ),
@@ -48,96 +74,75 @@ class MenuCard extends StatelessWidget {
                     const SizedBox(
                       width: 10,
                     ),
-                    isVeg
+                    widget.isVeg
                         ? VegChip('VEG', AppColors.veg)
                         : VegChip('Non-VEG', AppColors.nonveg)
                   ],
                 ),
-                Text(hotelName),
-                Text("(${rating.toString()})"),
+                Text(widget.hotelName),
+                Text("(${widget.rating.toString()})"),
                 Row(
                   children: [
                     Text(
-                      "Rs $dprice",
+                      "Rs ${widget.dprice}",
                       style: const TextStyle(fontSize: 20),
                     ),
                     const SizedBox(
                       width: 5,
                     ),
                     Text(
-                      "Rs $oprice",
+                      "${widget.oprice}",
                       style: const TextStyle(
-                          fontSize: 15, decoration: TextDecoration.lineThrough),
-                    )
+                          fontSize: 12, decoration: TextDecoration.lineThrough),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
                   ],
-                )
+                ),
+                addtocartbtn(),
               ],
             ),
           ),
           SizedBox(
             width: 10,
           ),
-          image == null
-              ? Text("KOKO")
+          widget.image == null
+              ? Container(
+                  width: 150,
+                  height: 150,
+                  child: Image.asset('assets/images/No_Image_Available.jpg'))
               : Container(
                   width: 150,
                   height: 150,
-                  // child: Image.network(
-                  //   "https://mumbaimillionaires.in/mmApi$image",
-                  //   errorBuilder: (context, error, stackTrace) {
-                  //     return Text('No Image');
-                  //   },
-                  //   loadingBuilder: (BuildContext context, Widget child,
-                  //       ImageChunkEvent? loadingProgress) {
-                  //     if (loadingProgress == null) return child;
-                  //     return Center(
-                  //       child: CircularProgressIndicator(),
-                  //     );
-                  //   },
-                  //   fit: BoxFit.cover,
-                  // ),
-                  // child: FadeInImage(
-                  //   image: NetworkImage(
-                  //       "https://mumbaimillionaires.in/mmApi$image",),
-                  //   placeholder: const AssetImage(
-                  //       "assets/images/No_Image_Available.jpg"),
-                  //   imageErrorBuilder: (context, error, stackTrace) {
-                  //     return Image.asset('assets/images/No_Image_Available.jpg',
-                  //         fit: BoxFit.fitWidth);
-                  //   },
-                  //   fit: BoxFit.fitWidth,
-                  // ),
-                  // child: CachedNetworkImage(
-                  //   placeholder: (context, url) =>
-                  //       Center(child: new CircularProgressIndicator()),
-                  //   errorWidget: (context, url, error) => Icon(Icons.error),
-                  //   imageUrl: "https://mumbaimillionaires.in/mmApi$image",
-                  //   imageBuilder: (context, imageProvider) => Container(
-                  //     decoration: BoxDecoration(
-                  //       image: DecorationImage(
-                  //         image: imageProvider,
-                  //         fit: BoxFit.cover,
-                  //       ),
-                  //     ),
-                  //   ),
-                  //   fit: BoxFit.fill,
-                  // ),
                   child: Image.network(
-                    'https://mumbaimillionaires.in/mmApi/public/storage/image/menu/juice.jpg',
+                    'https://mumbaimillionaires.in/mmApi${widget.image}',
                     errorBuilder: (BuildContext context, Object exception,
                         StackTrace? stackTrace) {
-                      // Appropriate logging or analytics, e.g.
-                      // myAnalytics.recordError(
-                      //   'An error occurred loading "https://example.does.not.exist/image.jpg"',
-                      //   exception,
-                      //   stackTrace,
-                      // );
-                      return const Text('ð¢');
+                      return Image.asset(
+                          'assets/images/No_Image_Available.jpg');
                     },
                   ),
                 )
         ],
       ),
+    );
+  }
+
+  ElevatedButton addtocartbtn() {
+    return ElevatedButton(
+      onPressed: () {
+        widget.addCartmain(
+          widget.menu_id,
+          widget.partner_id,
+          widget.size,
+          widget.dprice,
+          widget.rdprice,
+          widget.mdprice,
+          widget.ldprice,
+        );
+      },
+      child: Icon(Icons.add_shopping_cart),
     );
   }
 

@@ -18,9 +18,9 @@ class MenuApi {
       // body:{
       // main data}
       // }
-      print(res);
+      
       var responseBody = _returnResponse(res);
-      print(responseBody);
+      
       List<MenuModel> menuData = List.from(responseBody['data'])
           .map((item) => MenuModel.fromMap(item))
           .toList();
